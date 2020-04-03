@@ -9,7 +9,6 @@ library(igraph)
 library(ggraph)
 library(colormap)
 library(dplyr)
-library(networkD3)
 
 require(quanteda)
 
@@ -38,8 +37,8 @@ dictops <- dictionary(list(tags = c("are", "or", "not", "nor", "and", "but")))
 head(dfm(doc.corpus, dictionary = dictops))
 
 
-dictions <- function(){
-if (dicttags == "because" || dicttags == "if" || dicttags == "therefore") { # have to refine (change the tags here)
+will_to_believe <- 
+  if (dicttags == "because" || dicttags == "if" || dicttags == "therefore") { # have to refine (change the tags here)
   kwic(
     doc.corpus,
     dictops,
@@ -60,41 +59,21 @@ if (dicttags == "because" || dicttags == "if" || dicttags == "therefore") { # ha
     remove_punct = TRUE
   )
 }
-}
-# make into compound tokens--which dictionary?
-toks <- tokens(doc.corpus)
 
-kw_multiword1 <- kwic(toks, pattern = phrase(c('because', 'if', 'therefore', 'then', 'if', 'to')))
-kw_multiword2 <- kwic(toks, pattern = phrase(c("are", "or", "not", "nor", "and", "but")))
+#make data frame manipulable
+phil_frame <- data.frame(will_to_believe)
 
+prenodes = phil_frame %>% 
+  select(pre)
+phil_link = phil_frame %>%
+  select(keyword)
+postnodes = phil_frame %>%
+  select(post)
 
-operators <- function(kw_multiword2){
-  if (dicttags == "because" || dicttags == "if" || dicttags == "therefore" || dicttags == "then" || dicttags == "if" || dicttags == "to") {
-    print (kw_multiword2)
-  } 
-}
+#plot
+src <- c(prenodes) 
+link <- c(phil_link)
+target <- c(postnodes)
 
-
-#make each token a corpus
-corpus(kw_multiword2)
-idemes <- kw_multiword2
-
-operators()
-
-
-
-# make Sankey
-# create nodes data by determining all unique nodes found in your data
-node_names <- unique(c(as.character(idemes$source), as.character(idemes$target)))
-nodes <- data.frame(name = node_names)
-
-# create links data by matching the source and target values to the index of the
-# node it refers to in the nodes data frame
-links <- data.frame(source = match(kw_multiword2$source, node_names) - 1,
-                    target = match(kw_multiword2$target, node_names) - 1)
-
-
-# !!!!!!!!-as.matrix(?)
-sankeyNetwork(Links = "links", Nodes = "nodes", Source = "source", 
-              Target = "target")
-
+networkData <- data.frame(src, link, target)
+simpleNetwork(networkData)

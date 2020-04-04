@@ -75,5 +75,5 @@ src <- c(prenodes)
 edges <- c(phil_link)
 target <- c(postnodes)
 
-networkData <- data.frame(src, edges, target)
+networkData <- data.frame(src, target, edges)
 simpleNetwork(networkData)

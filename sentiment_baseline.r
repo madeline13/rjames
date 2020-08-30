@@ -35,7 +35,7 @@ usa_sentiment <- df %>%
   group_by(index = "word")
 
 usa_theta <- usa_sentiment %>%
-  summarise(sentiment = sd(value, na.rm = TRUE)) %>% #get std deviation
+  summarise(sentiment = sqrt(sd(value, na.rm = TRUE))) %>% #get std deviation
   mutate(method = "AFINN")
 
 #if sd > 1.30, emotional content is non-neutral; that means fewer terms cluster around a mean that approaches 0 with larger text samples
